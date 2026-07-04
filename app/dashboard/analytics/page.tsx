@@ -2,6 +2,8 @@ import { endOfDay, format, startOfDay, startOfWeek, subDays } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { AnalyticsCharts } from "./analytics-charts";
 
+export const dynamic = "force-dynamic";
+
 interface WorkerRow {
 	worker_id: string;
 	users?: { full_name?: string } | null;

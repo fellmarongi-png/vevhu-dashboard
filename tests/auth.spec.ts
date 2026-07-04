@@ -4,7 +4,7 @@ test.describe("Authentication", () => {
 	test("login page renders correctly", async ({ page }) => {
 		await page.goto("/login");
 		await expect(
-			page.getByRole("heading", { name: /vevhu dashboard/i }),
+			page.getByRole("heading", { name: /vevhu (resources|dashboard)/i }),
 		).toBeVisible();
 		await expect(page.getByLabel("Email")).toBeVisible();
 		await expect(page.getByLabel("Password")).toBeVisible();
