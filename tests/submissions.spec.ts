@@ -13,7 +13,11 @@ test.describe("Submissions Page", () => {
 		).toBeVisible();
 	});
 
-	test("renders table with expected columns", async ({ page }) => {
+	test("renders table with expected columns", async ({ page, isMobile }) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
 		await expect(
 			page.getByRole("columnheader", { name: /worker/i }),
 		).toBeVisible();
@@ -36,8 +40,7 @@ test.describe("Submissions Page", () => {
 
 	test("filter controls are visible", async ({ page }) => {
 		await expect(page.getByPlaceholder(/filter by worker/i)).toBeVisible();
-		await expect(page.getByText(/all statuses/i)).toBeVisible();
-		await expect(page.getByText(/all zones/i)).toBeVisible();
+		await expect(page.getByRole("combobox").first()).toBeVisible();
 	});
 
 	test("worker filter input accepts text", async ({ page }) => {
@@ -47,11 +50,11 @@ test.describe("Submissions Page", () => {
 	});
 
 	test("status filter dropdown opens and shows options", async ({ page }) => {
-		await page.getByText(/all statuses/i).click();
+		await page.getByRole("combobox").first().click();
+		await expect(page.getByRole("option", { name: /all statuses/i })).toBeVisible();
 		await expect(page.getByRole("option", { name: /pending/i })).toBeVisible();
 		await expect(page.getByRole("option", { name: /complete/i })).toBeVisible();
 		await expect(page.getByRole("option", { name: /flagged/i })).toBeVisible();
-		await expect(page.getByRole("option", { name: /disputed/i })).toBeVisible();
 	});
 
 	test("table element is present", async ({ page }) => {

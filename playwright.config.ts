@@ -5,8 +5,9 @@ export default defineConfig({
 	webServer: {
 		command: "npm run start",
 		url: "http://localhost:3000",
-		reuseExistingServer: true,
+		reuseExistingServer: false,
 		timeout: 30000,
+		env: { PLAYWRIGHT_TEST: "true" },
 	},
 	use: { baseURL: "http://localhost:3000", screenshot: "only-on-failure" },
 	projects: [

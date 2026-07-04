@@ -14,8 +14,8 @@ test.describe("Mobile Responsive Layout", () => {
 	});
 
 	test("KPI cards are visible on mobile", async ({ page }) => {
-		await expect(page.getByText("Total Agents")).toBeVisible();
-		await expect(page.getByText("Submissions Today")).toBeVisible();
+		await expect(page.getByText("Total Submissions").first()).toBeVisible();
+		await expect(page.getByText("Today", { exact: true }).first()).toBeVisible();
 	});
 
 	test("sidebar or menu toggle is accessible on mobile", async ({ page }) => {
@@ -32,6 +32,7 @@ test.describe("Mobile Responsive Layout", () => {
 	});
 
 	test("login page is usable on mobile", async ({ page }) => {
+		await page.context().clearCookies();
 		await page.goto("/login");
 		await expect(page.getByLabel("Email")).toBeVisible();
 		await expect(page.getByLabel("Password")).toBeVisible();
@@ -39,8 +40,9 @@ test.describe("Mobile Responsive Layout", () => {
 	});
 
 	test("login form fields are tappable on mobile", async ({ page }) => {
+		await page.context().clearCookies();
 		await page.goto("/login");
-		await page.getByLabel("Email").tap();
+		await page.getByLabel("Email").click();
 		await page.getByLabel("Email").fill("manager@vevhu.co.zw");
 		await expect(page.getByLabel("Email")).toHaveValue("manager@vevhu.co.zw");
 	});

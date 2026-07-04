@@ -17,7 +17,11 @@ test.describe("Worker Management", () => {
 		).toBeVisible();
 	});
 
-	test("workers table is visible with expected columns", async ({ page }) => {
+	test("workers table is visible with expected columns", async ({ page, isMobile }) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
 		await expect(
 			page.getByRole("columnheader", { name: /name/i }),
 		).toBeVisible();

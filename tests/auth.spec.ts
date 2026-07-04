@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { loginAsManager } from "./helpers/auth";
 
 test.describe("Authentication", () => {
 	test("login page renders correctly", async ({ page }) => {
@@ -12,10 +13,7 @@ test.describe("Authentication", () => {
 	});
 
 	test("successful login redirects to /dashboard", async ({ page }) => {
-		await page.goto("/login");
-		await page.getByLabel("Email").fill("manager@vevhu.co.zw");
-		await page.getByLabel("Password").fill("password123");
-		await page.getByRole("button", { name: /sign in/i }).click();
+		await loginAsManager(page);
 		await expect(page).toHaveURL("/dashboard");
 	});
 

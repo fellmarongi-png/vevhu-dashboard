@@ -70,7 +70,9 @@ export default function LoginPage() {
 						height={56}
 						className="mb-2 mx-auto rounded-xl"
 					/>
-					<CardTitle className="text-2xl font-bold">Vevhu Resources</CardTitle>
+					<CardTitle>
+						<h1 className="text-2xl font-bold">Vevhu Resources</h1>
+					</CardTitle>
 					<CardDescription>Sign in to the manager dashboard</CardDescription>
 				</CardHeader>
 				<CardContent>

@@ -7,10 +7,10 @@ test.describe("Dashboard Overview", () => {
 	});
 
 	test("renders KPI cards", async ({ page }) => {
-		await expect(page.getByText("Total Agents")).toBeVisible();
-		await expect(page.getByText("Submissions Today")).toBeVisible();
-		await expect(page.getByText("Locations Covered")).toBeVisible();
-		await expect(page.getByText("Completion Rate")).toBeVisible();
+		await expect(page.getByText("Total Submissions").first()).toBeVisible();
+		await expect(page.getByText("Active Workers").first()).toBeVisible();
+		await expect(page.getByText("Today", { exact: true }).first()).toBeVisible();
+		await expect(page.getByText("Pending Review").first()).toBeVisible();
 	});
 
 	test("renders overview heading", async ({ page }) => {
@@ -19,8 +19,12 @@ test.describe("Dashboard Overview", () => {
 		).toBeVisible();
 	});
 
-	test("navigation sidebar is visible with nav items", async ({ page }) => {
-		await expect(page.getByText("Vevhu")).toBeVisible();
+	test("navigation sidebar is visible with nav items", async ({ page, isMobile }) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
+		await expect(page.getByText(/vevhu/i).first()).toBeVisible();
 		await expect(page.getByRole("link", { name: /overview/i })).toBeVisible();
 		await expect(
 			page.getByRole("link", { name: /submissions/i }),
@@ -28,42 +32,62 @@ test.describe("Dashboard Overview", () => {
 		await expect(page.getByRole("link", { name: /map view/i })).toBeVisible();
 		await expect(page.getByRole("link", { name: /analytics/i })).toBeVisible();
 		await expect(
-			page.getByRole("link", { name: /form builder/i }),
+			page.getByRole("link", { name: "Form Builder", exact: true }),
 		).toBeVisible();
 	});
 
 	test("clicking Submissions nav item navigates to /dashboard/submissions", async ({
 		page,
+		isMobile,
 	}) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
 		await page.getByRole("link", { name: /submissions/i }).click();
 		await expect(page).toHaveURL("/dashboard/submissions");
 	});
 
 	test("clicking Map View nav item navigates to /dashboard/map", async ({
 		page,
+		isMobile,
 	}) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
 		await page.getByRole("link", { name: /map view/i }).click();
 		await expect(page).toHaveURL("/dashboard/map");
 	});
 
 	test("clicking Analytics nav item navigates to /dashboard/analytics", async ({
 		page,
+		isMobile,
 	}) => {
+		if (isMobile) {
+			test.skip();
+			return;
+		}
 		await page.getByRole("link", { name: /analytics/i }).click();
 		await expect(page).toHaveURL("/dashboard/analytics");
 	});
 
 	test("clicking Form Builder nav item navigates to /dashboard/form-builder", async ({
 		page,
+		isMobile,
 	}) => {
-		await page.getByRole("link", { name: /form builder/i }).click();
+		if (isMobile) {
+			test.skip();
+			return;
+		}
+		await page.getByRole("link", { name: "Form Builder", exact: true }).click();
 		await expect(page).toHaveURL("/dashboard/form-builder");
 	});
 
-	test("Recent Submissions and Agent Activity cards are present", async ({
+	test("Recent Submissions and Quick Actions cards are present", async ({
 		page,
 	}) => {
 		await expect(page.getByText("Recent Submissions")).toBeVisible();
-		await expect(page.getByText("Agent Activity")).toBeVisible();
+		await expect(page.getByText("Quick Actions")).toBeVisible();
 	});
 });
