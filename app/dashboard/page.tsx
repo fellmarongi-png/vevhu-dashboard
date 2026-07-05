@@ -151,25 +151,20 @@ export default async function DashboardPage() {
 							Collected today
 						</p>
 					</CardContent>
-						</div>
-						<p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
-							Collected since 00:00
-						</p>
-					</CardContent>
 				</Card>
 
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-						<CardTitle className="text-xs sm:text-sm font-medium">
+				<Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+					<CardContent className="flex flex-col items-center p-3 text-center sm:p-5">
+						<span className="mb-2 flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 sm:mb-3 sm:size-10 sm:rounded-xl">
+							<Clock className="size-4 sm:size-5" />
+						</span>
+						<p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
 							Pending Sync
-						</CardTitle>
-						<ClockIcon className="size-3.5 sm:size-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-						<div className="text-lg sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
+						</p>
+						<p className="mt-1 text-2xl font-bold tabular-nums sm:mt-2 sm:text-3xl">
 							{data.pendingSubmissions.toLocaleString()}
-						</div>
-						<p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+						</p>
+						<p className="mt-1 text-[10px] text-muted-foreground sm:mt-1.5 sm:text-xs">
 							Awaiting verification
 						</p>
 					</CardContent>
@@ -179,8 +174,12 @@ export default async function DashboardPage() {
 			<div className="grid gap-3 sm:gap-4 md:grid-cols-2">
 				<Card>
 					<CardHeader className="p-3 sm:p-6">
-						<CardTitle className="text-sm sm:text-base">Recent Submissions</CardTitle>
-						<CardDescription className="text-xs sm:text-sm">Latest field collections submitted by workers.</CardDescription>
+						<CardTitle className="text-sm sm:text-base">
+							Recent Submissions
+						</CardTitle>
+						<CardDescription className="text-xs sm:text-sm">
+							Latest field collections submitted by workers.
+						</CardDescription>
 					</CardHeader>
 					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
 						{data.recentSubmissions.length === 0 ? (
@@ -197,7 +196,8 @@ export default async function DashboardPage() {
 									>
 										<div className="space-y-0.5">
 											<p className="text-sm font-medium">
-												{submission.worker_name}
+												{(submission as { worker_name?: string }).worker_name ??
+													"Unknown Worker"}
 											</p>
 											<p className="text-xs text-muted-foreground">
 												Stand {submission.stand_number_official ?? "—"} &middot;{" "}

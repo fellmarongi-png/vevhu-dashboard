@@ -2,7 +2,7 @@
 
 import { AlertCircle, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,6 @@ const STATUS_OPTIONS = ["all", "complete", "pending", "flagged"] as const;
 
 export default function MapPage() {
 	const [submissions, setSubmissions] = useState<Submission[]>([]);
-	const [filtered, setFiltered] = useState<Submission[]>([]);
 	const [workers, setWorkers] = useState<{ id: string; name: string }[]>([]);
 
 	const [dateFrom, setDateFrom] = useState("");
@@ -103,7 +102,6 @@ export default function MapPage() {
 				}));
 
 			setSubmissions(parsed);
-			setFiltered(parsed);
 
 			const workerMap = new globalThis.Map<string, string>();
 			parsed.forEach((s) => {
@@ -119,7 +117,7 @@ export default function MapPage() {
 		fetchSubmissions();
 	}, []);
 
-	const applyFilters = useCallback(() => {
+	const filtered = useMemo(() => {
 		let result = submissions;
 
 		if (dateFrom) {
@@ -135,12 +133,8 @@ export default function MapPage() {
 			result = result.filter((s) => s.status === statusFilter);
 		}
 
-		setFiltered(result);
+		return result;
 	}, [submissions, dateFrom, dateTo, workerFilter, statusFilter]);
-
-	useEffect(() => {
-		applyFilters();
-	}, [applyFilters]);
 
 	return (
 		<div className="flex flex-col h-full -m-3 sm:-m-6">

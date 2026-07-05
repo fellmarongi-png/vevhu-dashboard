@@ -222,7 +222,9 @@ export default function FormBuilderPage() {
 				setSchema({
 					id: data.id as string,
 					version: data.version as number,
-					sections: ((data.fields ?? data.sections) as FormSection[]) ?? [DEFAULT_SECTION],
+					sections: ((data.fields ?? data.sections) as FormSection[]) ?? [
+						DEFAULT_SECTION,
+					],
 				});
 			}
 			setLoading(false);
@@ -556,8 +558,8 @@ export default function FormBuilderPage() {
 									<div className="space-y-1.5">
 										<Label className="text-xs">Options</Label>
 										<div className="space-y-1">
-											{/* biome-ignore lint/suspicious/noArrayIndexKey: option indices may duplicate string values */}
 											{(selectedField.options ?? []).map((opt, i) => (
+												/* biome-ignore lint/suspicious/noArrayIndexKey: option index */
 												<div key={`opt-${i}`} className="flex gap-1">
 													<Input
 														value={opt}
