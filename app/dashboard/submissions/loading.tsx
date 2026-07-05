@@ -13,14 +13,14 @@ export default function SubmissionsLoading() {
 				{/* Table header */}
 				<div className="border-b bg-muted/50 px-4 py-3 flex gap-4">
 					{Array.from({ length: 5 }).map((_, i) => (
-						<Skeleton key={i} className="h-4 w-24" />
+						<Skeleton key={`hdr-${i}`} className="h-4 w-24" />
 					))}
 				</div>
 
 				{/* Table rows */}
 				<div className="divide-y">
 					{Array.from({ length: 8 }).map((_, i) => (
-						<div key={i} className="px-4 py-3 flex items-center gap-4">
+						<div key={`row-${i}`} className="px-4 py-3 flex items-center gap-4">
 							<Skeleton className="h-4 w-20" />
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="h-4 w-16" />

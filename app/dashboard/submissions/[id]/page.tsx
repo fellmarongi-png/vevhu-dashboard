@@ -1,5 +1,11 @@
 import { format } from "date-fns";
-import { ImageIcon, MapPinIcon, MicIcon, PenToolIcon } from "lucide-react";
+import {
+	FileTextIcon,
+	ImageIcon,
+	MapPinIcon,
+	MicIcon,
+	PenToolIcon,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import { SubmissionStatusSelect } from "@/components/submissions/submission-status-select";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +62,13 @@ export default async function SubmissionDetailPage({
 		"stand_number_physical",
 		"respondent_name",
 		"respondent_type",
+		"respondent_phone",
+		"is_legal_owner",
+		"owner_name",
+		"owner_phone",
+		"account_standing",
+		"action_taken",
+		"field_notes",
 		"status",
 		"collected_at",
 		"photos",
@@ -69,10 +82,22 @@ export default async function SubmissionDetailPage({
 		"updated_at",
 		"synced_at",
 		"users",
+		"form_schema_version",
+		"extra_fields",
 	]);
+
 	const formFields = Object.entries(submission).filter(
 		([key]) => !excludeKeys.has(key),
 	);
+
+	// Extract extra_fields if present
+	const extraFields =
+		typeof submission.extra_fields === "object" &&
+		submission.extra_fields !== null
+			? Object.entries(submission.extra_fields)
+			: typeof submission.extra_fields === "string"
+				? Object.entries(JSON.parse(submission.extra_fields || "{}"))
+				: [];
 
 	return (
 		<div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
@@ -101,15 +126,17 @@ export default async function SubmissionDetailPage({
 				</div>
 			</div>
 
-			{/* Core info */}
+			{/* Core Overview Card */}
 			<Card>
 				<CardHeader className="p-3 sm:p-6">
-					<CardTitle className="text-sm sm:text-base">Overview</CardTitle>
+					<CardTitle className="text-sm sm:text-base">
+						Stand & Respondent Overview
+					</CardTitle>
 				</CardHeader>
 				<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
-							Worker
+							Field Worker
 						</p>
 						<p className="font-medium">
 							{submission.users?.full_name ?? submission.worker_id}
@@ -117,7 +144,7 @@ export default async function SubmissionDetailPage({
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
-							Stand #
+							Official Stand #
 						</p>
 						<p className="font-medium">
 							{submission.stand_number_official ?? "—"}
@@ -125,21 +152,67 @@ export default async function SubmissionDetailPage({
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
-							Respondent
+							On-Site Physical Stand #
+						</p>
+						<p className="font-medium">
+							{submission.stand_number_physical ?? "—"}
+						</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Respondent Name
 						</p>
 						<p className="font-medium">{submission.respondent_name ?? "—"}</p>
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
-							Form Type
+							Respondent Phone
 						</p>
-						<p className="font-medium">{submission.form_type ?? "—"}</p>
+						<p className="font-medium">{submission.respondent_phone ?? "—"}</p>
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
-							Zone
+							Respondent Type
 						</p>
-						<p className="font-medium">{submission.zone ?? "—"}</p>
+						<p className="font-medium">{submission.respondent_type ?? "—"}</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Is Registered Owner?
+						</p>
+						<p className="font-medium">
+							{submission.is_legal_owner
+								? "Yes (Owner)"
+								: "No (Tenant/Caretaker)"}
+						</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Legal Owner Name
+						</p>
+						<p className="font-medium">
+							{submission.owner_name || submission.respondent_name || "—"}
+						</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Legal Owner Phone
+						</p>
+						<p className="font-medium">
+							{submission.owner_phone || submission.respondent_phone || "—"}
+						</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Rates Account Standing
+						</p>
+						<p className="font-medium">{submission.account_standing ?? "—"}</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Action / Notice Served
+						</p>
+						<p className="font-medium">{submission.action_taken ?? "None"}</p>
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -154,17 +227,45 @@ export default async function SubmissionDetailPage({
 				</CardContent>
 			</Card>
 
-			{/* Dynamic form fields */}
-			{formFields.length > 0 && (
+			{/* Field Notes Card */}
+			{submission.field_notes && (
 				<Card>
 					<CardHeader className="p-3 sm:p-6">
-						<CardTitle className="text-sm sm:text-base">Form Data</CardTitle>
+						<CardTitle className="text-sm sm:text-base flex items-center gap-2">
+							<FileTextIcon className="size-4" /> Field Notes & Observations
+						</CardTitle>
+					</CardHeader>
+					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+						<p className="text-sm whitespace-pre-wrap leading-relaxed text-foreground bg-muted/40 p-3 rounded-lg border">
+							{submission.field_notes}
+						</p>
+					</CardContent>
+				</Card>
+			)}
+
+			{/* Dynamic & Extra Fields */}
+			{(formFields.length > 0 || extraFields.length > 0) && (
+				<Card>
+					<CardHeader className="p-3 sm:p-6">
+						<CardTitle className="text-sm sm:text-base">
+							Dynamic Custom Fields
+						</CardTitle>
 						<CardDescription className="text-xs sm:text-sm">
-							All recorded field responses
+							Additional schema and custom survey responses
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
 						{formFields.map(([key, value]) => (
+							<div key={key}>
+								<p className="text-xs text-muted-foreground uppercase tracking-wide">
+									{key.replace(/_/g, " ")}
+								</p>
+								<p className="font-medium break-words">
+									{value == null ? "—" : String(value)}
+								</p>
+							</div>
+						))}
+						{extraFields.map(([key, value]) => (
 							<div key={key}>
 								<p className="text-xs text-muted-foreground uppercase tracking-wide">
 									{key.replace(/_/g, " ")}
