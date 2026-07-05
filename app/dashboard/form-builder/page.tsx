@@ -129,6 +129,8 @@ function SortableFieldRow({
 
 	return (
 		<div
+			role="button"
+			tabIndex={0}
 			ref={setNodeRef}
 			style={style}
 			className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
@@ -137,6 +139,11 @@ function SortableFieldRow({
 					: "border-border hover:bg-accent/50"
 			}`}
 			onClick={onSelect}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					onSelect();
+				}
+			}}
 		>
 			<button
 				{...attributes}
@@ -205,7 +212,7 @@ export default function FormBuilderPage() {
 			const { data } = await supabase
 				.from("form_schemas")
 				.select("*")
-				.eq("active", true)
+				.eq("is_active", true)
 				.order("version", { ascending: false })
 				.limit(1)
 				.maybeSingle();
@@ -214,7 +221,7 @@ export default function FormBuilderPage() {
 				setSchema({
 					id: data.id as string,
 					version: data.version as number,
-					sections: (data.sections as FormSection[]) ?? [DEFAULT_SECTION],
+					sections: ((data.fields ?? data.sections) as FormSection[]) ?? [DEFAULT_SECTION],
 				});
 			}
 			setLoading(false);
@@ -549,7 +556,7 @@ export default function FormBuilderPage() {
 										<Label className="text-xs">Options</Label>
 										<div className="space-y-1">
 											{(selectedField.options ?? []).map((opt, i) => (
-												<div key={i} className="flex gap-1">
+												<div key={`opt-${opt}-${i}`} className="flex gap-1">
 													<Input
 														value={opt}
 														onChange={(e) => {

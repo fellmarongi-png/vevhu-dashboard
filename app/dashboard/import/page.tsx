@@ -167,6 +167,8 @@ export default function ImportPage() {
 			<Card>
 				<CardContent className="pt-6">
 					<div
+						role="button"
+						tabIndex={0}
 						className={`border-2 border-dashed rounded-xl p-6 sm:p-10 text-center cursor-pointer transition-colors ${
 							dragging
 								? "border-primary bg-primary/5"
@@ -179,6 +181,11 @@ export default function ImportPage() {
 						onDragLeave={() => setDragging(false)}
 						onDrop={handleDrop}
 						onClick={() => fileInputRef.current?.click()}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								fileInputRef.current?.click();
+							}
+						}}
 					>
 						<UploadIcon className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
 						{fileName ? (
@@ -279,7 +286,7 @@ export default function ImportPage() {
 								</TableHeader>
 								<TableBody>
 									{previewRows.map((row, i) => (
-										<TableRow key={i}>
+										<TableRow key={`preview-row-${row.stand_number || i}`}>
 											{OUR_FIELDS.map(({ key }) => {
 												const srcCol = columnMapping[key];
 												return (
@@ -343,8 +350,8 @@ export default function ImportPage() {
 								</div>
 								{result.errors.length > 0 && (
 									<div className="mt-2 space-y-1">
-										{result.errors.map((e, i) => (
-											<p key={i} className="text-sm text-destructive">
+										{result.errors.map((e) => (
+											<p key={e} className="text-sm text-destructive">
 												{e}
 											</p>
 										))}

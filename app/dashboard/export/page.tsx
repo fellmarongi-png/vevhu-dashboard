@@ -133,7 +133,9 @@ export default function ExportPage() {
 			const extraKeys = new Set<string>();
 			rows.forEach((r) => {
 				if (r.extra_fields && typeof r.extra_fields === "object") {
-					Object.keys(r.extra_fields).forEach((k) => extraKeys.add(k));
+					Object.keys(r.extra_fields).forEach((k) => {
+						extraKeys.add(k);
+					});
 				}
 			});
 

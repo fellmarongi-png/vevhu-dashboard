@@ -44,7 +44,7 @@ export default function WorkersPage() {
 	const [addOpen, setAddOpen] = React.useState(false);
 	const [editWorker, setEditWorker] = React.useState<Worker | null>(null);
 
-	async function fetchWorkers() {
+	const fetchWorkers = React.useCallback(async () => {
 		const supabase = createClient();
 		const today = new Date().toISOString().slice(0, 10);
 
@@ -75,7 +75,7 @@ export default function WorkersPage() {
 
 		setWorkers(data.map((w) => ({ ...w, today_count: countMap[w.id] ?? 0 })));
 		setLoading(false);
-	}
+	}, []);
 
 	React.useEffect(() => {
 		fetchWorkers();

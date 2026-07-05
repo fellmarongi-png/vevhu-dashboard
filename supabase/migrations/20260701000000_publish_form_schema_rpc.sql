@@ -10,20 +10,31 @@ CREATE OR REPLACE FUNCTION publish_form_schema(
 )
 RETURNS uuid
 LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
 AS $$
 DECLARE
   new_id uuid;
 BEGIN
   -- Lock and deactivate all currently active schemas.
   -- SELECT ... FOR UPDATE ensures concurrent calls serialize here.
-  PERFORM id FROM form_schemas WHERE active = true FOR UPDATE;
-  UPDATE form_schemas SET active = false WHERE active = true;
+  PERFORM id FROM form_schemas WHERE is_active = true FOR UPDATE;
+  UPDATE form_schemas SET is_active = false WHERE is_active = true;
 
   -- Insert the new active schema
-  INSERT INTO form_schemas (id, version, sections, active, created_at)
-  VALUES (gen_random_uuid(), schema_version, schema_sections, true, now())
+  INSERT INTO form_schemas (id, version, name, fields, is_active, created_at, published_at)
+  VALUES (
+    gen_random_uuid(),
+    schema_version,
+    'Standard Form v' || schema_version,
+    schema_sections,
+    true,
+    now(),
+    now()
+  )
   RETURNING id INTO new_id;
 
   RETURN new_id;
 END;
 $$;
+

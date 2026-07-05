@@ -12,15 +12,15 @@ export default function SubmissionsLoading() {
 			<div className="rounded-xl border ring-1 ring-foreground/10 overflow-hidden">
 				{/* Table header */}
 				<div className="border-b bg-muted/50 px-4 py-3 flex gap-4">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<Skeleton key={`hdr-${i}`} className="h-4 w-24" />
+					{["col1", "col2", "col3", "col4", "col5"].map((colKey) => (
+						<Skeleton key={colKey} className="h-4 w-24" />
 					))}
 				</div>
 
 				{/* Table rows */}
 				<div className="divide-y">
-					{Array.from({ length: 8 }).map((_, i) => (
-						<div key={`row-${i}`} className="px-4 py-3 flex items-center gap-4">
+					{["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"].map((rowKey) => (
+						<div key={rowKey} className="px-4 py-3 flex items-center gap-4">
 							<Skeleton className="h-4 w-20" />
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="h-4 w-16" />

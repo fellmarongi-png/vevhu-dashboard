@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
 
-const STATUSES = ["pending", "complete", "flagged", "disputed"] as const;
+const STATUSES = ["pending", "synced", "complete", "flagged", "disputed"] as const;
 type Status = (typeof STATUSES)[number];
 
 interface SubmissionStatusSelectProps {

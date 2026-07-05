@@ -11,8 +11,8 @@ export default function DashboardLoading() {
 
 			{/* KPI cards skeleton */}
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<Card key={i}>
+				{["kpi-1", "kpi-2", "kpi-3", "kpi-4"].map((id) => (
+					<Card key={id}>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="h-4 w-4 rounded" />
@@ -36,9 +36,9 @@ export default function DashboardLoading() {
 						<Skeleton className="h-4 w-32 mt-1" />
 					</CardHeader>
 					<CardContent className="space-y-4">
-						{Array.from({ length: 5 }).map((_, i) => (
+						{["row-1", "row-2", "row-3", "row-4", "row-5"].map((id) => (
 							<div
-								key={i}
+								key={id}
 								className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
 							>
 								<div className="space-y-1">

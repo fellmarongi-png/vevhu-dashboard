@@ -110,29 +110,48 @@ export default function AnnouncementsPage() {
 
 	const targetType = watch("target_type");
 
-	async function fetchData() {
+	const fetchData = React.useCallback(async () => {
 		const supabase = createClient();
-		const { data: ann } = await supabase
-			.from("announcements")
-			.select("*")
-			.order("created_at", { ascending: false });
-		if (ann) setAnnouncements(ann as Announcement[]);
 
-		const { data: workerData } = await supabase
-			.from("users")
-			.select("id, full_name, zone_assigned")
-			.eq("role", "worker")
-			.order("full_name");
-		if (workerData) setWorkers(workerData);
+		const [annRes, userRes] = await Promise.all([
+			supabase
+				.from("announcements")
+				.select("*")
+				.order("created_at", { ascending: false }),
+			supabase
+				.from("users")
+				.select("id, full_name, zone_assigned")
+				.eq("role", "worker")
+				.order("full_name"),
+		]);
 
+		if (annRes.error) {
+			console.error("Error loading announcements:", annRes.error);
+		} else {
+			setAnnouncements((annRes.data ?? []) as Announcement[]);
+		}
+
+		if (userRes.error) {
+			console.error("Error loading workers:", userRes.error);
+		} else {
+			setWorkers(
+				(userRes.data ?? []) as {
+					id: string;
+					full_name: string;
+					zone_assigned: string | null;
+				}[],
+			);
+		}
+
+		// Extract unique non-null zones
 		const zoneSet = new Set<string>();
-		workerData?.forEach((w) => {
+		(userRes.data ?? []).forEach((w) => {
 			if (w.zone_assigned) zoneSet.add(w.zone_assigned);
 		});
 		setZones([...zoneSet].sort());
 
 		setLoading(false);
-	}
+	}, []);
 
 	React.useEffect(() => {
 		fetchData();
@@ -277,13 +296,21 @@ export default function AnnouncementsPage() {
 													{ value: "zone", label: "Zone" },
 												] as const
 											).map((option) => (
-												<label
+												<div
 													key={option.value}
 													className="flex items-center gap-1.5 cursor-pointer text-sm"
 												>
-													<RadioGroupItem value={option.value} />
-													{option.label}
-												</label>
+													<RadioGroupItem
+														id={`target-${option.value}`}
+														value={option.value}
+													/>
+													<Label
+														htmlFor={`target-${option.value}`}
+														className="cursor-pointer"
+													>
+														{option.label}
+													</Label>
+												</div>
 											))}
 										</RadioGroup>
 									)}

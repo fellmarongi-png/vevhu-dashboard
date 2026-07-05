@@ -4,11 +4,11 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
-export default function Error({
+export default function DashboardError({
 	error,
 	reset,
 }: {
-	error: Error;
+	error: Error & { digest?: string };
 	reset: () => void;
 }) {
 	return (

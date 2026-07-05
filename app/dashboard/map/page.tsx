@@ -98,15 +98,17 @@ export default function MapPage() {
 					worker_name: r.users?.full_name ?? r.worker_id,
 					created_at: r.created_at,
 					status: (r.status as Submission["status"]) ?? "pending",
-					latitude: r.gps_latitude!,
-					longitude: r.gps_longitude!,
+					latitude: r.gps_latitude ?? 0,
+					longitude: r.gps_longitude ?? 0,
 				}));
 
 			setSubmissions(parsed);
 			setFiltered(parsed);
 
 			const workerMap = new globalThis.Map<string, string>();
-			parsed.forEach((s) => workerMap.set(s.worker_id, s.worker_name));
+			parsed.forEach((s) => {
+				workerMap.set(s.worker_id, s.worker_name);
+			});
 			setWorkers(
 				Array.from(workerMap.entries()).map(([id, name]) => ({ id, name })),
 			);

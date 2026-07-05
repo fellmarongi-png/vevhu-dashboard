@@ -25,6 +25,7 @@ const STATUS_COLORS: Record<
 	"default" | "secondary" | "destructive" | "outline"
 > = {
 	pending: "secondary",
+	synced: "default",
 	complete: "default",
 	flagged: "destructive",
 	disputed: "outline",
@@ -54,6 +55,26 @@ export default async function SubmissionDetailPage({
 	const gpsLat: number | null = submission.gps_latitude ?? null;
 	const gpsLng: number | null = submission.gps_longitude ?? null;
 
+	// Safe extra_fields extraction
+	let parsedExtraFields: Record<string, unknown> = {};
+	if (
+		typeof submission.extra_fields === "object" &&
+		submission.extra_fields !== null
+	) {
+		parsedExtraFields = submission.extra_fields as Record<string, unknown>;
+	} else if (typeof submission.extra_fields === "string") {
+		try {
+			parsedExtraFields = JSON.parse(submission.extra_fields || "{}");
+		} catch {
+			parsedExtraFields = {};
+		}
+	}
+
+	const nationalId =
+		submission.respondent_national_id ||
+		(parsedExtraFields.respondent_national_id as string) ||
+		"—";
+
 	// Collect form fields (exclude known top-level fields)
 	const excludeKeys = new Set([
 		"id",
@@ -63,6 +84,7 @@ export default async function SubmissionDetailPage({
 		"respondent_name",
 		"respondent_type",
 		"respondent_phone",
+		"respondent_national_id",
 		"is_legal_owner",
 		"owner_name",
 		"owner_phone",
@@ -90,14 +112,9 @@ export default async function SubmissionDetailPage({
 		([key]) => !excludeKeys.has(key),
 	);
 
-	// Extract extra_fields if present
-	const extraFields =
-		typeof submission.extra_fields === "object" &&
-		submission.extra_fields !== null
-			? Object.entries(submission.extra_fields)
-			: typeof submission.extra_fields === "string"
-				? Object.entries(JSON.parse(submission.extra_fields || "{}"))
-				: [];
+	const extraFields = Object.entries(parsedExtraFields).filter(
+		([key]) => !excludeKeys.has(key),
+	);
 
 	return (
 		<div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
@@ -169,6 +186,12 @@ export default async function SubmissionDetailPage({
 							Respondent Phone
 						</p>
 						<p className="font-medium">{submission.respondent_phone ?? "—"}</p>
+					</div>
+					<div>
+						<p className="text-xs text-muted-foreground uppercase tracking-wide">
+							Respondent National ID
+						</p>
+						<p className="font-medium font-mono">{nationalId}</p>
 					</div>
 					<div>
 						<p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -289,18 +312,18 @@ export default async function SubmissionDetailPage({
 					</CardHeader>
 					<CardContent>
 						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-							{photos.map((url, i) => (
+							{photos.map((url) => (
 								<a
-									key={i}
+									key={url}
 									href={url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="block aspect-square overflow-hidden rounded-lg border ring-1 ring-foreground/10 hover:opacity-90 transition-opacity"
 								>
-									{/* eslint-disable-next-line @next/next/no-img-element */}
+									{/* biome-ignore lint/performance/noImgElement: External user uploaded media */}
 									<img
 										src={url}
-										alt={`Photo ${i + 1}`}
+										alt="Stand document evidence"
 										className="h-full w-full object-cover"
 									/>
 								</a>
@@ -319,6 +342,7 @@ export default async function SubmissionDetailPage({
 						</CardTitle>
 					</CardHeader>
 					<CardContent>
+						{/* biome-ignore lint/a11y/useMediaCaption: Audio preview of field interview */}
 						<audio controls className="w-full" src={audioUrl}>
 							Your browser does not support the audio element.
 						</audio>
@@ -336,10 +360,10 @@ export default async function SubmissionDetailPage({
 					</CardHeader>
 					<CardContent>
 						<div className="rounded-lg border bg-white p-2 ring-1 ring-foreground/10 inline-block">
-							{/* eslint-disable-next-line @next/next/no-img-element */}
+							{/* biome-ignore lint/performance/noImgElement: User signature canvas image */}
 							<img
 								src={signatureUrl}
-								alt="Signature"
+								alt="Resident signature capture"
 								className="max-h-40 object-contain"
 							/>
 						</div>
