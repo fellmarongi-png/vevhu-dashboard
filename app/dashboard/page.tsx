@@ -151,33 +151,38 @@ export default async function DashboardPage() {
 							Collected today
 						</p>
 					</CardContent>
+						</div>
+						<p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+							Collected since 00:00
+						</p>
+					</CardContent>
 				</Card>
 
-				<Card className="relative overflow-hidden transition-shadow hover:shadow-md border-destructive/20">
-					<CardContent className="flex flex-col items-center p-3 text-center sm:p-5">
-						<span className="mb-2 flex size-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive sm:mb-3 sm:size-10 sm:rounded-xl">
-							<Clock className="size-4 sm:size-5" />
-						</span>
-						<p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
-							Pending Review
-						</p>
-						<p className="mt-1 text-2xl font-bold tabular-nums sm:mt-2 sm:text-3xl">
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+						<CardTitle className="text-xs sm:text-sm font-medium">
+							Pending Sync
+						</CardTitle>
+						<ClockIcon className="size-3.5 sm:size-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+						<div className="text-lg sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
 							{data.pendingSubmissions.toLocaleString()}
-						</p>
-						<p className="mt-1 text-[10px] text-muted-foreground sm:mt-1.5 sm:text-xs">
-							Awaiting approval
+						</div>
+						<p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+							Awaiting verification
 						</p>
 					</CardContent>
 				</Card>
 			</div>
 
-			<div className="grid gap-3 sm:gap-5 lg:grid-cols-2">
+			<div className="grid gap-3 sm:gap-4 md:grid-cols-2">
 				<Card>
-					<CardHeader>
-						<CardTitle className="text-base">Recent Submissions</CardTitle>
-						<CardDescription>Latest field data entries</CardDescription>
+					<CardHeader className="p-3 sm:p-6">
+						<CardTitle className="text-sm sm:text-base">Recent Submissions</CardTitle>
+						<CardDescription className="text-xs sm:text-sm">Latest field collections submitted by workers.</CardDescription>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
 						{data.recentSubmissions.length === 0 ? (
 							<p className="text-sm text-muted-foreground py-8 text-center">
 								No submissions yet. Data will appear once field workers submit
@@ -185,14 +190,14 @@ export default async function DashboardPage() {
 							</p>
 						) : (
 							<div className="space-y-3">
-								{data.recentSubmissions.map((submission: any) => (
+								{data.recentSubmissions.map((submission) => (
 									<div
 										key={submission.id}
 										className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
 									>
 										<div className="space-y-0.5">
 											<p className="text-sm font-medium">
-												{submission.users?.full_name ?? "Unknown Worker"}
+												{submission.worker_name}
 											</p>
 											<p className="text-xs text-muted-foreground">
 												Stand {submission.stand_number_official ?? "—"} &middot;{" "}
@@ -203,7 +208,7 @@ export default async function DashboardPage() {
 											</p>
 										</div>
 										<Badge variant={getStatusVariant(submission.status)}>
-											{submission.status ?? "unknown"}
+											{submission.status}
 										</Badge>
 									</div>
 								))}

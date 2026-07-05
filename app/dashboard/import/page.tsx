@@ -166,6 +166,7 @@ export default function ImportPage() {
 			{/* Upload Zone */}
 			<Card>
 				<CardContent className="pt-6">
+					{/* biome-ignore lint/a11y/useSemanticElements: file dropzone container */}
 					<div
 						role="button"
 						tabIndex={0}

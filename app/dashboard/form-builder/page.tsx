@@ -128,6 +128,7 @@ function SortableFieldRow({
 	const Icon = TYPE_ICONS[field.type];
 
 	return (
+		/* biome-ignore lint/a11y/useSemanticElements: draggable field item container */
 		<div
 			role="button"
 			tabIndex={0}
@@ -555,8 +556,9 @@ export default function FormBuilderPage() {
 									<div className="space-y-1.5">
 										<Label className="text-xs">Options</Label>
 										<div className="space-y-1">
+											{/* biome-ignore lint/suspicious/noArrayIndexKey: option indices may duplicate string values */}
 											{(selectedField.options ?? []).map((opt, i) => (
-												<div key={`opt-${opt}-${i}`} className="flex gap-1">
+												<div key={`opt-${i}`} className="flex gap-1">
 													<Input
 														value={opt}
 														onChange={(e) => {
