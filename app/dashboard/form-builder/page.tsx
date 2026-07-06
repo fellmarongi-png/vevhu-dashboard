@@ -219,12 +219,30 @@ export default function FormBuilderPage() {
 				.maybeSingle();
 
 			if (data) {
+				const rawSections = (data.fields ?? data.sections) as unknown;
+				let parsedSections: FormSection[] = [DEFAULT_SECTION];
+
+				if (Array.isArray(rawSections) && rawSections.length > 0) {
+					const firstItem = rawSections[0];
+					if (firstItem && typeof firstItem === "object" && "fields" in firstItem && Array.isArray(firstItem.fields)) {
+						parsedSections = rawSections as FormSection[];
+					} else {
+						// Convert legacy flat FormField list into a default FormSection layout
+						parsedSections = [
+							{
+								id: generateId(),
+								title: "Section 1",
+								script: "",
+								fields: rawSections as FormField[],
+							},
+						];
+					}
+				}
+
 				setSchema({
 					id: data.id as string,
 					version: data.version as number,
-					sections: ((data.fields ?? data.sections) as FormSection[]) ?? [
-						DEFAULT_SECTION,
-					],
+					sections: parsedSections,
 				});
 			}
 			setLoading(false);
@@ -234,10 +252,10 @@ export default function FormBuilderPage() {
 
 	// ─── Computed helpers ─────────────────────────────────────────────────────
 
-	const activeSection = schema.sections[activeSectionIdx] ?? schema.sections[0];
+	const activeSection = schema.sections[activeSectionIdx] ?? schema.sections[0] ?? DEFAULT_SECTION;
 
 	const selectedField =
-		activeSection?.fields.find((f) => f.id === selectedFieldId) ?? null;
+		activeSection?.fields?.find((f) => f.id === selectedFieldId) ?? null;
 
 	// ─── Mutators ─────────────────────────────────────────────────────────────
 
@@ -257,7 +275,7 @@ export default function FormBuilderPage() {
 			setSchema((prev) => {
 				const sections = prev.sections.map((sec) => ({
 					...sec,
-					fields: sec.fields.map((f) =>
+					fields: (sec.fields ?? []).map((f) =>
 						f.id === fieldId ? { ...f, ...patch } : f,
 					),
 				}));
@@ -276,14 +294,14 @@ export default function FormBuilderPage() {
 			options: type === "dropdown" ? ["Option 1"] : undefined,
 		};
 		updateSection(activeSectionIdx, {
-			fields: [...activeSection.fields, newField],
+			fields: [...(activeSection?.fields ?? []), newField],
 		});
 		setSelectedFieldId(newField.id);
 	};
 
 	const deleteField = (fieldId: string) => {
 		updateSection(activeSectionIdx, {
-			fields: activeSection.fields.filter((f) => f.id !== fieldId),
+			fields: (activeSection?.fields ?? []).filter((f) => f.id !== fieldId),
 		});
 		if (selectedFieldId === fieldId) setSelectedFieldId(null);
 	};
@@ -291,10 +309,11 @@ export default function FormBuilderPage() {
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
 		if (!over || active.id === over.id) return;
-		const oldIndex = activeSection.fields.findIndex((f) => f.id === active.id);
-		const newIndex = activeSection.fields.findIndex((f) => f.id === over.id);
+		const fieldsList = activeSection?.fields ?? [];
+		const oldIndex = fieldsList.findIndex((f) => f.id === active.id);
+		const newIndex = fieldsList.findIndex((f) => f.id === over.id);
 		updateSection(activeSectionIdx, {
-			fields: arrayMove(activeSection.fields, oldIndex, newIndex),
+			fields: arrayMove(fieldsList, oldIndex, newIndex),
 		});
 	};
 
@@ -470,12 +489,12 @@ export default function FormBuilderPage() {
 							<CardTitle className="text-sm">
 								Fields
 								<span className="ml-2 text-muted-foreground font-normal">
-									({activeSection?.fields.length ?? 0})
+									({activeSection?.fields?.length ?? 0})
 								</span>
 							</CardTitle>
 						</CardHeader>
 						<CardContent className="px-4 pb-4">
-							{activeSection?.fields.length === 0 ? (
+							{(activeSection?.fields?.length ?? 0) === 0 ? (
 								<div className="border-2 border-dashed rounded-lg py-8 text-center text-sm text-muted-foreground">
 									Click a field type on the left to add fields
 								</div>
@@ -486,11 +505,11 @@ export default function FormBuilderPage() {
 									onDragEnd={handleDragEnd}
 								>
 									<SortableContext
-										items={activeSection.fields.map((f) => f.id)}
+										items={(activeSection?.fields ?? []).map((f) => f.id)}
 										strategy={verticalListSortingStrategy}
 									>
 										<div className="space-y-2">
-											{activeSection.fields.map((field) => (
+											{(activeSection?.fields ?? []).map((field) => (
 												<SortableFieldRow
 													key={field.id}
 													field={field}
