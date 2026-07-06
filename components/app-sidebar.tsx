@@ -36,6 +36,7 @@ const navMain = [
 	{ title: "Submissions", href: "/dashboard/submissions", icon: FileText },
 	{ title: "Field Workers", href: "/dashboard/workers", icon: Users },
 	{ title: "Map View", href: "/dashboard/map", icon: MapPin },
+	{ title: "Spitzkop Lot 6 Plan", href: "/dashboard/site-plan", icon: MapPin },
 	{ title: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
