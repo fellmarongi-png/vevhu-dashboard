@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import {
 	FileTextIcon,
 	ImageIcon,
+	HistoryIcon,
 	MapPinIcon,
 	MicIcon,
 	PenToolIcon,
@@ -39,15 +40,25 @@ export default async function SubmissionDetailPage({
 	const { id } = await params;
 	const supabase = await createServerSupabaseClient();
 
-	const { data: submission, error } = await supabase
-		.from("submissions")
-		.select("*, users!worker_id(full_name)")
-		.eq("id", id)
-		.single();
+	const [subRes, editsRes] = await Promise.all([
+		supabase
+			.from("submissions")
+			.select("*, users!worker_id(full_name)")
+			.eq("id", id)
+			.single(),
+		supabase
+			.from("submission_edits")
+			.select("*")
+			.eq("submission_id", id)
+			.order("edited_at", { ascending: false }),
+	]);
 
-	if (error || !submission) {
+	if (subRes.error || !subRes.data) {
 		notFound();
 	}
+
+	const submission = subRes.data;
+	const edits = editsRes.data ?? [];
 
 	const photos: string[] = submission.photos ?? [];
 	const audioUrl: string | null = submission.audio_recording_key ?? null;
@@ -393,6 +404,49 @@ export default async function SubmissionDetailPage({
 					</CardContent>
 				</Card>
 			)}
+
+			{/* Audit Trail / Edit History */}
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2 text-base">
+						<HistoryIcon className="size-4 text-primary" /> Audit Trail & Worker Edit History ({edits.length})
+					</CardTitle>
+					<CardDescription>
+						Complete record of modifications submitted by field workers for audit compliance.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					{edits.length === 0 ? (
+						<p className="text-xs text-muted-foreground py-2">
+							No edits recorded for this submission. Initial survey entry is original and un-modified.
+						</p>
+					) : (
+						<div className="space-y-4">
+							{edits.map((edit: { id: string; edited_by_worker_name?: string; edited_at: string; edit_reason?: string; updated_data: unknown }) => (
+								<div key={edit.id} className="p-3 rounded-lg border bg-muted/40 space-y-2 text-xs">
+									<div className="flex items-center justify-between font-semibold">
+										<span>👤 Edited by {edit.edited_by_worker_name || "Field Agent"}</span>
+										<span className="text-muted-foreground font-normal">
+											{format(new Date(edit.edited_at), "MMM d, yyyy h:mm a")}
+										</span>
+									</div>
+									{edit.edit_reason && (
+										<p className="text-muted-foreground italic">
+											Reason: &quot;{edit.edit_reason}&quot;
+										</p>
+									)}
+									<div className="bg-background p-2 rounded border text-[11px]">
+										<p className="font-medium mb-1 text-primary">Modifications Captured:</p>
+										<pre className="whitespace-pre-wrap overflow-x-auto text-[10px] text-muted-foreground">
+											{JSON.stringify(edit.updated_data, null, 2)}
+										</pre>
+									</div>
+								</div>
+							))}
+						</div>
+					)}
+				</CardContent>
+			</Card>
 		</div>
 	);
 }
