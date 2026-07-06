@@ -13,9 +13,11 @@ import {
 	Users,
 	WrenchIcon,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import {
 	Sidebar,
 	SidebarContent,
@@ -28,6 +30,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarSeparator,
+	useSidebar,
 } from "@/components/ui/sidebar";
 import { createClient } from "@/lib/supabase/client";
 
@@ -54,7 +57,14 @@ const navTools = [
 export function AppSidebar() {
 	const pathname = usePathname();
 	const router = useRouter();
+	const { isMobile, setOpenMobile } = useSidebar();
 	const [role, setRole] = useState<string | null>(null);
+
+	const handleNavClick = useCallback(() => {
+		if (isMobile) {
+			setOpenMobile(false);
+		}
+	}, [isMobile, setOpenMobile]);
 
 	useEffect(() => {
 		async function fetchRole() {
@@ -75,6 +85,7 @@ export function AppSidebar() {
 	}, []);
 
 	async function handleSignOut() {
+		if (isMobile) setOpenMobile(false);
 		const supabase = createClient();
 		await supabase.auth.signOut();
 		router.push("/login");
@@ -82,39 +93,48 @@ export function AppSidebar() {
 	}
 
 	return (
-		<Sidebar>
-			<SidebarHeader className="p-5 pb-4">
+		<Sidebar className="border-r border-border/60 bg-sidebar/95 backdrop-blur-md">
+			<SidebarHeader className="p-4 pb-3">
 				<div className="flex items-center gap-3">
-					<img
-						src="/vevhu-icon.png"
-						alt="Vevhu Resources"
-						className="size-9 rounded-lg"
-					/>
-					<div>
-						<p className="text-sm font-bold text-sidebar-foreground">
-							Vevhu Resources
+					<div className="relative size-10 rounded-xl overflow-hidden shadow-sm ring-1 ring-border bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+						<Image
+							src="/vevhu-icon.png"
+							alt="Vevhu Resources"
+							width={40}
+							height={40}
+							className="object-cover size-full"
+						/>
+					</div>
+					<div className="flex flex-col min-w-0">
+						<p className="text-sm font-extrabold tracking-tight text-sidebar-foreground truncate">
+							VEVHU RESOURCES
 						</p>
-						<p className="text-[11px] text-muted-foreground capitalize">
-							{role || "Admin"}
-						</p>
+						<div className="flex items-center gap-1.5 mt-0.5">
+							<Badge variant="outline" className="text-[10px] px-1.5 py-0 font-medium bg-primary/10 text-primary border-primary/20 capitalize">
+								{role || "Admin"}
+							</Badge>
+							<span className="text-[10px] text-muted-foreground truncate">Field System</span>
+						</div>
 					</div>
 				</div>
 			</SidebarHeader>
 
-			<SidebarSeparator />
+			<SidebarSeparator className="opacity-60" />
 
-			<SidebarContent className="px-3 py-2">
+			<SidebarContent className="px-2.5 py-2">
 				<SidebarGroup>
-					<SidebarGroupLabel>Main</SidebarGroupLabel>
+					<SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
+						Management
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
-						<SidebarMenu>
+						<SidebarMenu className="space-y-0.5">
 							{navMain.map((item) => (
 								<SidebarMenuItem key={item.href}>
 									<SidebarMenuButton
 										isActive={pathname === item.href}
 										render={
-											<Link href={item.href}>
-												<item.icon />
+											<Link href={item.href} onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
+												<item.icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
 												<span>{item.title}</span>
 											</Link>
 										}
@@ -125,17 +145,19 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 
-				<SidebarGroup>
-					<SidebarGroupLabel>Tools</SidebarGroupLabel>
+				<SidebarGroup className="mt-2">
+					<SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
+						Tools & Operations
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
-						<SidebarMenu>
+						<SidebarMenu className="space-y-0.5">
 							{navTools.map((item) => (
 								<SidebarMenuItem key={item.href}>
 									<SidebarMenuButton
 										isActive={pathname === item.href}
 										render={
-											<Link href={item.href}>
-												<item.icon />
+											<Link href={item.href} onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
+												<item.icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
 												<span>{item.title}</span>
 											</Link>
 										}
@@ -147,24 +169,24 @@ export function AppSidebar() {
 				</SidebarGroup>
 			</SidebarContent>
 
-			<SidebarSeparator />
+			<SidebarSeparator className="opacity-60" />
 
-			<SidebarFooter>
-				<SidebarMenu>
+			<SidebarFooter className="p-2.5">
+				<SidebarMenu className="space-y-0.5">
 					<SidebarMenuItem>
 						<SidebarMenuButton
 							isActive={pathname === "/dashboard/settings"}
 							render={
-								<Link href="/dashboard/settings">
-									<Settings />
+								<Link href="/dashboard/settings" onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
+									<Settings className="size-4 shrink-0" />
 									<span>Settings</span>
 								</Link>
 							}
 						/>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton onClick={handleSignOut}>
-							<LogOut />
+						<SidebarMenuButton onClick={handleSignOut} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive transition-all">
+							<LogOut className="size-4 shrink-0" />
 							<span>Sign out</span>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

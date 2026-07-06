@@ -16,9 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Vevhu Dashboard",
-	description: "Field data collection manager dashboard",
+	title: "Vevhu Resources — Field Verification System",
+	description: "Offline-first field data collection and manager portal for Vevhu Resources",
 	manifest: "/manifest.json",
+	icons: {
+		icon: "/vevhu-icon.png",
+		apple: "/vevhu-icon.png",
+	},
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
