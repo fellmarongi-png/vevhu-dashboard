@@ -2,6 +2,7 @@
 
 import {
 	BarChart3,
+	ChevronRight,
 	DownloadIcon,
 	FileText,
 	LayoutDashboard,
@@ -9,6 +10,7 @@ import {
 	MapPin,
 	MegaphoneIcon,
 	Settings,
+	ShieldCheck,
 	UploadIcon,
 	Users,
 	WrenchIcon,
@@ -45,8 +47,8 @@ const navMain = [
 
 const navTools = [
 	{ title: "Form Builder", href: "/dashboard/form-builder", icon: WrenchIcon },
-	{ title: "Export", href: "/dashboard/export", icon: DownloadIcon },
-	{ title: "Import", href: "/dashboard/import", icon: UploadIcon },
+	{ title: "Export Data", href: "/dashboard/export", icon: DownloadIcon },
+	{ title: "Import Data", href: "/dashboard/import", icon: UploadIcon },
 	{
 		title: "Announcements",
 		href: "/dashboard/announcements",
@@ -93,102 +95,183 @@ export function AppSidebar() {
 	}
 
 	return (
-		<Sidebar className="border-r border-border/60 bg-sidebar/95 backdrop-blur-md">
+		<Sidebar className="border-r border-border/80 bg-sidebar/95 backdrop-blur-xl shadow-lg select-none">
+			{/* Brand Header */}
 			<SidebarHeader className="p-4 pb-3">
 				<div className="flex items-center gap-3">
-					<div className="relative size-10 rounded-xl overflow-hidden shadow-sm ring-1 ring-border bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+					<div className="relative size-11 rounded-2xl overflow-hidden shadow-md ring-2 ring-primary/20 bg-white p-0.5 shrink-0">
 						<Image
 							src="/vevhu-icon.png"
 							alt="Vevhu Resources"
-							width={40}
-							height={40}
-							className="object-cover size-full"
+							width={44}
+							height={44}
+							className="object-cover size-full rounded-xl"
+							priority
 						/>
 					</div>
 					<div className="flex flex-col min-w-0">
-						<p className="text-sm font-extrabold tracking-tight text-sidebar-foreground truncate">
+						<h2 className="text-base font-black tracking-tight text-sidebar-foreground truncate leading-snug">
 							VEVHU RESOURCES
-						</p>
+						</h2>
 						<div className="flex items-center gap-1.5 mt-0.5">
-							<Badge variant="outline" className="text-[10px] px-1.5 py-0 font-medium bg-primary/10 text-primary border-primary/20 capitalize">
+							<Badge
+								variant="default"
+								className="text-[11px] px-2 py-0.5 font-bold bg-primary text-primary-foreground shadow-xs capitalize"
+							>
+								<ShieldCheck className="size-3 mr-0.5 inline-block" />
 								{role || "Admin"}
 							</Badge>
-							<span className="text-[10px] text-muted-foreground truncate">Field System</span>
+							<span className="text-xs text-muted-foreground font-medium truncate">
+								Field System
+							</span>
 						</div>
 					</div>
 				</div>
 			</SidebarHeader>
 
-			<SidebarSeparator className="opacity-60" />
+			<SidebarSeparator className="my-1 opacity-60" />
 
-			<SidebarContent className="px-2.5 py-2">
+			{/* Navigation Content */}
+			<SidebarContent className="px-3 py-2 space-y-4">
 				<SidebarGroup>
-					<SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
-						Management
+					<SidebarGroupLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground/90 px-3 py-1 mb-1.5 flex items-center justify-between">
+						<span>Management</span>
+						<span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-mono">
+							Core
+						</span>
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
-						<SidebarMenu className="space-y-0.5">
-							{navMain.map((item) => (
-								<SidebarMenuItem key={item.href}>
-									<SidebarMenuButton
-										isActive={pathname === item.href}
-										render={
-											<Link href={item.href} onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
-												<item.icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
-												<span>{item.title}</span>
-											</Link>
-										}
-									/>
-								</SidebarMenuItem>
-							))}
+						<SidebarMenu className="space-y-1">
+							{navMain.map((item) => {
+								const isActive = pathname === item.href;
+								return (
+									<SidebarMenuItem key={item.href}>
+										<SidebarMenuButton
+											isActive={isActive}
+											className="h-auto p-0 hover:bg-transparent"
+											render={
+												<Link
+													href={item.href}
+													onClick={handleNavClick}
+													className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group ${
+														isActive
+															? "bg-primary text-primary-foreground shadow-md shadow-primary/25 font-bold"
+															: "text-sidebar-foreground/80 hover:bg-accent/80 hover:text-sidebar-foreground"
+													}`}
+												>
+													<item.icon
+														className={`size-5 shrink-0 transition-transform duration-200 ${
+															isActive
+																? "text-primary-foreground scale-110"
+																: "text-muted-foreground group-hover:text-primary group-hover:scale-110"
+														}`}
+													/>
+													<span className="flex-1 truncate">{item.title}</span>
+													{isActive && (
+														<span className="size-1.5 rounded-full bg-primary-foreground animate-pulse" />
+													)}
+												</Link>
+											}
+										/>
+									</SidebarMenuItem>
+								);
+							})}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
 
-				<SidebarGroup className="mt-2">
-					<SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80 px-2 mb-1">
-						Tools & Operations
+				<SidebarGroup>
+					<SidebarGroupLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground/90 px-3 py-1 mb-1.5 flex items-center justify-between">
+						<span>Tools & Operations</span>
+						<span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-mono">
+							Admin
+						</span>
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
-						<SidebarMenu className="space-y-0.5">
-							{navTools.map((item) => (
-								<SidebarMenuItem key={item.href}>
-									<SidebarMenuButton
-										isActive={pathname === item.href}
-										render={
-											<Link href={item.href} onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
-												<item.icon className="size-4 shrink-0 transition-transform group-hover:scale-110" />
-												<span>{item.title}</span>
-											</Link>
-										}
-									/>
-								</SidebarMenuItem>
-							))}
+						<SidebarMenu className="space-y-1">
+							{navTools.map((item) => {
+								const isActive = pathname === item.href;
+								return (
+									<SidebarMenuItem key={item.href}>
+										<SidebarMenuButton
+											isActive={isActive}
+											className="h-auto p-0 hover:bg-transparent"
+											render={
+												<Link
+													href={item.href}
+													onClick={handleNavClick}
+													className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group ${
+														isActive
+															? "bg-primary text-primary-foreground shadow-md shadow-primary/25 font-bold"
+															: "text-sidebar-foreground/80 hover:bg-accent/80 hover:text-sidebar-foreground"
+													}`}
+												>
+													<item.icon
+														className={`size-5 shrink-0 transition-transform duration-200 ${
+															isActive
+																? "text-primary-foreground scale-110"
+																: "text-muted-foreground group-hover:text-primary group-hover:scale-110"
+														}`}
+													/>
+													<span className="flex-1 truncate">{item.title}</span>
+													{isActive && (
+														<span className="size-1.5 rounded-full bg-primary-foreground animate-pulse" />
+													)}
+												</Link>
+											}
+										/>
+									</SidebarMenuItem>
+								);
+							})}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
 
-			<SidebarSeparator className="opacity-60" />
+			<SidebarSeparator className="my-1 opacity-60" />
 
-			<SidebarFooter className="p-2.5">
-				<SidebarMenu className="space-y-0.5">
+			{/* Footer */}
+			<SidebarFooter className="p-3">
+				<SidebarMenu className="space-y-1">
 					<SidebarMenuItem>
 						<SidebarMenuButton
 							isActive={pathname === "/dashboard/settings"}
+							className="h-auto p-0 hover:bg-transparent"
 							render={
-								<Link href="/dashboard/settings" onClick={handleNavClick} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium transition-all hover:bg-accent/80">
-									<Settings className="size-4 shrink-0" />
-									<span>Settings</span>
+								<Link
+									href="/dashboard/settings"
+									onClick={handleNavClick}
+									className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group ${
+										pathname === "/dashboard/settings"
+											? "bg-primary text-primary-foreground shadow-md shadow-primary/25 font-bold"
+											: "text-sidebar-foreground/80 hover:bg-accent/80 hover:text-sidebar-foreground"
+									}`}
+								>
+									<Settings
+										className={`size-5 shrink-0 transition-transform duration-200 ${
+											pathname === "/dashboard/settings"
+												? "text-primary-foreground scale-110"
+												: "text-muted-foreground group-hover:text-primary group-hover:scale-110"
+										}`}
+									/>
+									<span className="flex-1 truncate">Settings</span>
+									{pathname === "/dashboard/settings" && (
+										<span className="size-1.5 rounded-full bg-primary-foreground animate-pulse" />
+									)}
 								</Link>
 							}
 						/>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton onClick={handleSignOut} className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive transition-all">
-							<LogOut className="size-4 shrink-0" />
-							<span>Sign out</span>
-						</SidebarMenuButton>
+						<button
+							type="button"
+							onClick={handleSignOut}
+							className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive transition-all duration-200 group"
+						>
+							<LogOut className="size-5 shrink-0 transition-transform group-hover:-translate-x-0.5" />
+							<span className="flex-1 text-left truncate">Sign out</span>
+							<ChevronRight className="size-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+						</button>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>
